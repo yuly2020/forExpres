@@ -1,0 +1,185 @@
+﻿@model IEnumerable<SimpleEmailExample.Models.Email>
+
+
+
+<link href="~/Content/bootstrap.css" rel="stylesheet" />
+<link href="~/Content/Site.css" rel="stylesheet" />
+<div class="row">
+
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <div class="col-11">
+                    <span class="card-title text-white"><i class="fa fa-chart-bar"></i> Listado de envios</span>
+                </div>
+                <div class="col-1">
+                    <div class="card-actions float-right text-white cursor-pointer">
+                        <a data-action="collapse"><i class="ti-minus"></i></a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="card-body">
+
+
+            <div class="table-responsive m-t-40">
+
+                <table id="tablaRecurso" class="table table-bordered table-striped">
+                    <thead>
+                        <tr>
+
+                            <th class="text-center">Id</th>
+                            <th class="text-center">Email</th>
+                            <th class="text-center">Subject</th>
+
+                            <th class="text-center">Message</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model)
+                        {
+                            <tr>
+
+                                <td class="text-center">@Html.DisplayFor(modelItem => item.Id)</td>
+                                <td class="text-center">@Html.DisplayFor(modelItem => item.Email1)</td>
+                                <td class="text-center">@Html.DisplayFor(modelItem => item.Subject)</td>
+                                <td class="text-center">@Html.DisplayFor(modelItem => item.Message)</td>
+
+
+                            </tr>
+
+                        }
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="table-responsive m-t-40" id="Envio" role="dialog">
+                <div class="modal-dialog">
+
+                    <div id="Datos" class="tab-pane active">
+                        <div class="table-responsive m-actual-40">
+                            <h4 class="modal-title"><i class="fa fa-history"></i> Enviar por Correo </h4>
+                            <div class="card-body">
+                                <form id="frmEnvioCorreo" method="post" enctype="multipart/form-data" action="/Home/EnvioEmail">
+                                    @Html.AntiForgeryToken()
+                                    @Html.ValidationSummary(true)
+
+                                    <div class="modal-body">
+                                        <div class="card-body">
+                                            <div class="row">
+
+                                                <div class="form-group col-md-6">
+                                                    <div class="form-group">
+                                                        <label class="col-form-label"><b>Para:</b></label>
+                                                        <div class="input-group">
+                                                            <input asp-for="TX_Email" name="TX_Email" class="form-control text-capitalize" placeholder="Cuenta de Correo">
+                                                            <div class="input-group-append">
+                                                                <span class="input-group-text">
+                                                                    <i class="fa fa-xs fa-user-circle"></i>
+                                                                </span>
+                                                            </div>
+                                                                                                                    </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="row">
+                                                <div class="form-group col-md-6" ">
+                                                    <div class="form-group">
+                                                        <label class="col-form-label"><b>Subject:</b></label>
+
+                                                        <div class="input-group">
+                                                            <input asp-for="TX_Subject" name="TX_Subject" class="form-control text-capitalize">
+                                                            <div class="input-group-append">
+                                                                <span class="input-group-text">
+                                                                    <i class="fa fa-xs fa-user-circle"></i>
+                                                                </span>
+                                                            </div>
+                                                            <span asp-validation-for="TX_Subject" class="text-danger"></span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="row">
+                                                <div class="col-lg-12">
+                                                    <div class="form-group">
+                                                        <label class="col-form-label"><b>Mensaje</b></label>
+                                                        <div class="form-group">
+                                                            <div class="input-group">
+                                                                <textarea id="TX_Message" name="TX_Message" class="form-control"></textarea>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="modal-footer">
+                                                @*<button type="button" onclick="EnvioCorreo();" class="btn btn-sm btn-primary"><i class="fa fa-check"></i> Enviar correo</button>*@
+                                                <button id="enviar" onclick="EnvioCorreo();" type="submit" class="btn btn-default"><i class="fa fa-window-close"></i> Enviar correo</button>
+                                                <button type="button" class="btn btn-sm btn-inverse" data-dismiss="modal"><i class="fa fa-window-close"></i> Cerrar</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                            <h3 style="color:green">
+                                @ViewBag.Mensaje
+                            </h3>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+
+<script src="/Scripts/jquery-1.10.2.js"></script>
+<script src="~/Scripts/jquery.validate.js"></script>
+
+
+<script>
+    let EnvioCorreo = async () => {
+        const formIsValid = $("#frmEnvioCorreo").valid();
+        let formData = GetFormData('frmEnvioCorreo');
+
+        let TX_Email = $('#TX_Email').val()
+        let TX_Subject = formData.TX_Subject;
+        let TX_Message = formData.TX_Message;
+
+        let obj = {
+            'TX_Email': TX_Email,
+            'TX_Subject': TX_Subject,
+            'TX_Message': TX_Message,
+        }
+
+        if (!$("#TX_Email").val()) {
+            swal("Información", "Debe indicar Email del Destinatario .");
+            return false;
+        }
+
+
+
+
+        let response = await MakeRequestGET('EnvioCorreo/EnvioCorreo', obj).then((response) => {
+
+            if (response.status == 200 || response.status == 201) {
+
+                swal("Información", "El Correo fue enviado con EXITO");
+
+                location.reload();
+
+
+
+                $("#frmEnvioCorreo #Mensaje").val(mensaje.Mensaje);
+            }
+        });
+
+
+    }
+
+    function validateEmail($email) {
+        var emailReg = /^([\w-\.]+@@([\w-]+\.)+[\w-]{2,6})?$/;
+        return emailReg.test($email);
+    }
+</script>

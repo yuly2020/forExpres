@@ -1,0 +1,15 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2009/11/mapping/cs">
+  <EntityContainerMapping StorageEntityContainer="SimpleEmailDBModelStoreContainer" CdmEntityContainer="SimpleEmailDBConnection">
+    <EntitySetMapping Name="Email">
+      <EntityTypeMapping TypeName="SimpleEmailDBModel.Email">
+        <MappingFragment StoreEntitySet="Email">
+          <ScalarProperty Name="Message" ColumnName="Message" />
+          <ScalarProperty Name="Subject" ColumnName="Subject" />
+          <ScalarProperty Name="Email1" ColumnName="Email" />
+          <ScalarProperty Name="Id" ColumnName="Id" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+  </EntityContainerMapping>
+</Mapping>
